@@ -6,7 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express")); // Fixed the import syntax
 const auth_route_js_1 = __importDefault(require("./routes/auth.route.js"));
 const message_route_js_1 = __importDefault(require("./routes/message.route.js"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const app = (0, express_1.default)();
+app.use(express_1.default.json());
 app.get("/", (req, res) => {
     res.send("Hello from Express");
 });

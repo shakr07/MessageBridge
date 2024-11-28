@@ -4,14 +4,16 @@ import { Request, Response } from "express"; // Importing types
 import { Router } from "express";
 import prisma from "../db/prisma";
 import bcryptjs from "bcryptjs";
+import { generateToken } from "../utils/generatetoken";
 const route = Router();  
 export const signup = async (req: Request, res: Response): Promise<any> => {
 try {
-    const {fullName, username,password,confirmPassoword,gender}=req.body;
-    if(!fullName||!username||!password||!confirmPassoword||!gender){
-            return res.status(400).json({error:"PLease fill the fields"});
+    const { fullName, username, password, confirmPassword, gender } = req.body;
+
+    if (!fullName || !username || !password || !confirmPassword || !gender) {
+        return res.status(400).json({ error: "Please fill the fields" });
     }
-    if(password!==confirmPassoword){
+    if(password!==confirmPassword ){
         return res.status(400).json({error:"password and confirm password do not match with each other"});
 }
 
@@ -44,10 +46,10 @@ const newUser=await prisma.user.create({
 
 //if newuser is created
 if(newUser){
-
+newUser
 
   //generating the token for Jwt
-generateToke(newUser.id,)
+generateToken(newUser.id,res)
 
 
     res.status(201).json({
@@ -72,11 +74,45 @@ else{
 };
 
 
-export const login = async (req: Request, res: Response): Promise<void> => {
-    console.log("login");
+//        --login Code--
+
+
+
+export const login = async (req: Request, res: Response): Promise<any> => {
+    try{
+     const {username,password}=req.body;
+     const user:any=await prisma.user.findUnique({
+        where:{
+            username:username
+        }
+     })
+     if(!user){
+        return res.send(400).json({error:"Invalid usename"})
+     }
+     const ispasswordCorrect=await bcryptjs.compare(password,user.password);
+     if(ispasswordCorrect===true){
+        return res.status(400).json({error:"Invalid credentials"})
+     }
+     generateToken(user.id,res);
+
+     res.status(200).json({
+        id:user.id,
+        fullName:user.fullName,
+        username:user.usename,
+        profilePic:user.profilePic
+     });
+
+    }
+    catch(error:any){
+             console.log(error);
+    }
    
     res.send("Login route");
 };
+
+
+
+
 
 
 export const logout = async (req: Request, res: Response): Promise<void> => {
