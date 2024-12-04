@@ -2,12 +2,14 @@ import express, { Express, Request, Response } from "express"; // Fixed the impo
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import dotenv from "dotenv";
-
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 const app: Express = express();
 
 app.use( express.json());
+app.use(cookieParser());
+
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello from Express");
