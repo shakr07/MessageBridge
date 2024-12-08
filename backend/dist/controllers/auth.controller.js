@@ -119,9 +119,14 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.logout = logout;
 const getMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        if (!req.user) {
+            res.status(401).json({ error: "Unauthorized - User not authenticated" });
+            return;
+        }
         const user = yield prisma_1.default.user.findUnique({ where: { id: req.user.id } });
         if (!user) {
-            return res.status(404).json({ error: "User not found" });
+            res.status(404).json({ error: "User not found" });
+            return;
         }
         res.status(200).json({
             id: user.id,
@@ -131,7 +136,7 @@ const getMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        console.log("Error in getMe controller", error.message);
+        console.error("Error in getMe controller", error.message);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
